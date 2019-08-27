@@ -15,6 +15,19 @@ export class ZipComponent {
   // region: read
 
   list: any;
+
+  // endregion
+
+  // region: write
+
+  instance: JSZip | null = null;
+  data: { path: string; url: string }[] = [
+    { path: 'demo.docx', url: 'https://ng-alain.com/assets/demo.docx' },
+    {
+      path: '小程序标志.zip',
+      url: 'https://wximg.gtimg.com/shake_tv/mina/standard_logo.zip',
+    },
+  ];
   private format(data: any) {
     const files = data.files;
     this.list = Object.keys(files).map(key => {
@@ -31,22 +44,9 @@ export class ZipComponent {
   }
 
   change(e: Event) {
-    const file = (e.target as HTMLInputElement).files[0];
+    const file = (e.target as HTMLInputElement).files![0];
     this.zip.read(file).then(res => this.format(res));
   }
-
-  // endregion
-
-  // region: write
-
-  instance: JSZip = null;
-  data: { path: string; url: string }[] = [
-    { path: 'demo.docx', url: 'https://ng-alain.com/assets/demo.docx' },
-    {
-      path: '小程序标志.zip',
-      url: 'https://wximg.gtimg.com/shake_tv/mina/standard_logo.zip',
-    },
-  ];
 
   download() {
     const promises: Promise<any>[] = [];

@@ -12,9 +12,22 @@ export class UtilComponent {
 
   // region: string
 
+  // tslint:disable-next-line: no-invalid-template-strings
   format_str = 'this is ${name}';
   format_res = '';
   format_obj = JSON.stringify({ name: 'asdf' });
+
+  // yuan
+  yuan_str: any;
+  yuan_res: string;
+
+  // endregion
+
+  // region: other
+
+  content = `time ${+new Date()}
+
+    中文！@#￥%……&*`;
   onFormat() {
     let obj = null;
     try {
@@ -25,21 +38,9 @@ export class UtilComponent {
     }
     this.format_res = format(this.format_str, obj, true);
   }
-
-  // yuan
-  yuan_str: any;
-  yuan_res: string;
   onYuan(value: string) {
     this.yuan_res = yuan(value);
   }
-
-  // endregion
-
-  // region: other
-
-  content = `time ${+new Date()}
-
-    中文！@#￥%……&*`;
   onCopy() {
     copy(`time ${+new Date()}`).then(() => this.messageSrv.success(`success`));
   }

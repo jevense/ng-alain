@@ -1,12 +1,7 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  OnInit,
-  ChangeDetectorRef,
-} from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd';
 import { STColumn } from '@delon/abc';
-import { getTimeDistance } from '@delon/util';
+import { getTimeDistance, deepCopy } from '@delon/util';
 import { _HttpClient } from '@delon/theme';
 import { I18NService } from '@core';
 import { yuan } from '@shared';
@@ -18,6 +13,12 @@ import { yuan } from '@shared';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardAnalysisComponent implements OnInit {
+  constructor(
+    private http: _HttpClient,
+    public msg: NzMessageService,
+    private i18n: I18NService,
+    private cdr: ChangeDetectorRef,
+  ) {}
   data: any = {};
   loading = true;
   date_range: Date[] = [];
@@ -58,18 +59,19 @@ export class DashboardAnalysisComponent implements OnInit {
     },
   ];
 
-  constructor(
-    private http: _HttpClient,
-    public msg: NzMessageService,
-    private i18n: I18NService,
-    private cdr: ChangeDetectorRef,
-  ) {}
+  salesType = 'all';
+  salesPieData: any;
+  salesTotal = 0;
+
+  saleTabs: any[] = [{ key: 'sales', show: true }, { key: 'visits' }];
+
+  offlineIdx = 0;
 
   ngOnInit() {
     this.http.get('/chart').subscribe((res: any) => {
       res.offlineData.forEach((item: any, idx: number) => {
         item.show = idx === 0;
-        item.chart = Object.assign([], res.offlineChartData);
+        item.chart = deepCopy(res.offlineChartData);
       });
       this.data = res;
       this.loading = false;
@@ -81,10 +83,6 @@ export class DashboardAnalysisComponent implements OnInit {
     this.date_range = getTimeDistance(type);
     setTimeout(() => this.cdr.detectChanges());
   }
-
-  salesType = 'all';
-  salesPieData: any;
-  salesTotal = 0;
   changeSaleType() {
     this.salesPieData =
       this.salesType === 'all'
@@ -101,19 +99,12 @@ export class DashboardAnalysisComponent implements OnInit {
   handlePieValueFormat(value: any) {
     return yuan(value);
   }
-
-  saleTabs: any[] = [
-    { key: 'sales', show: true },
-    { key: 'visits' },
-  ];
   salesChange(idx: number) {
     if (this.saleTabs[idx].show !== true) {
       this.saleTabs[idx].show = true;
       this.cdr.detectChanges();
     }
   }
-
-  offlineIdx = 0;
   offlineChange(idx: number) {
     if (this.data.offlineData[idx].show !== true) {
       this.data.offlineData[idx].show = true;
